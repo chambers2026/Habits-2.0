@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="de-AT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a78d6">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Habits &amp; Essen</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f4f2;
+  --surface: #fcfcfb;
+  --surface-2: #ececea;
+  --border: #dddcd8;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --text-3: #7a7974;
+  --accent: #2a78d6;
+  --accent-ink: #ffffff;
+  --bar: #2a78d6;
+  --good: #0ca30c;
+  --mid: #fab219;
+  --bad: #d03b3b;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #111110;
+    --surface: #1a1a19;
+    --surface-2: #262624;
+    --border: #34332f;
+    --text: #ffffff;
+    --text-2: #c3c2b7;
+    --text-3: #918f86;
+    --accent: #3987e5;
+    --bar: #3987e5;
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+header { position: sticky; top: 0; z-index: 5; background: var(--bg);
+  padding: calc(10px + env(safe-area-inset-top)) 16px 8px; }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 15px; margin: 0 0 10px; color: var(--text-2); font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em; }
+main { padding: 0 12px; max-width: 640px; margin: 0 auto; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px; margin-bottom: 12px; }
+.row { display: flex; align-items: center; gap: 8px; }
+.between { justify-content: space-between; }
+.muted { color: var(--text-3); font-size: 14px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.btn { border: 1px solid var(--border); background: var(--surface-2); border-radius: 10px;
+  padding: 9px 14px; min-height: 42px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.btn.small { padding: 4px 10px; min-height: 34px; font-size: 14px; }
+.icon-btn { border: 0; background: transparent; font-size: 22px; width: 44px; height: 44px; border-radius: 10px; }
+.icon-btn:active { background: var(--surface-2); }
+input[type=text], input[type=number], select {
+  font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; min-height: 44px; width: 100%; }
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Date nav */
+.datenav { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.datenav .label { font-weight: 600; }
+
+/* Habits */
+.habit { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-top: 1px solid var(--border); }
+.habit:first-of-type { border-top: 0; }
+.check { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); background: transparent;
+  display: grid; place-items: center; font-size: 18px; flex: none; }
+.check.on { background: var(--good); border-color: var(--good); color: #fff; }
+.habit .name { flex: 1; }
+.streak { font-size: 13px; color: var(--text-2); white-space: nowrap; }
+
+/* Food entry */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--border); background: var(--surface-2); border-radius: 999px;
+  padding: 6px 11px; font-size: 14px; min-height: 34px; display: inline-flex; align-items: center; gap: 6px; }
+.chip.sel { border-color: var(--accent); outline: 2px solid var(--accent); }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+.dot.g { background: var(--good); } .dot.m { background: var(--mid); } .dot.s { background: var(--bad); }
+.rate { display: flex; gap: 6px; }
+.rate .chip { flex: 1; justify-content: center; }
+.suggest { font-size: 14px; color: var(--text-2); margin: 8px 0; min-height: 20px; }
+.stepper { display: flex; align-items: center; gap: 4px; }
+.stepper span { min-width: 34px; text-align: center; font-weight: 600; }
+.field { margin-top: 10px; }
+.field > label { display: block; font-size: 13px; color: var(--text-2); margin-bottom: 4px; }
+.food { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); }
+.food .info { flex: 1; min-width: 0; }
+.food .info div:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mealhead { font-size: 13px; font-weight: 600; color: var(--text-2); margin: 10px 0 2px; }
+.empty { color: var(--text-3); font-size: 14px; padding: 6px 0; }
+.hidden { display: none !important; }
+
+/* Stats */
+.seg { display: flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 12px; }
+.seg button { flex: 1; border: 0; background: transparent; border-radius: 8px; padding: 8px; font-size: 14px; }
+.seg button.on { background: var(--surface); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.stack { display: flex; height: 22px; border-radius: 6px; overflow: hidden; gap: 2px; background: var(--surface); }
+.stack div { height: 100%; }
+.stack div:first-child { border-radius: 4px 0 0 4px; } .stack div:last-child { border-radius: 0 4px 4px 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: 14px; color: var(--text-2); }
+.legend b { color: var(--text); }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { background: var(--surface-2); border-radius: 12px; padding: 12px; }
+.tile .big { font-size: 26px; font-weight: 700; line-height: 1.1; }
+.tile .lbl { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+.hbar { display: grid; grid-template-columns: 1fr; gap: 3px; padding: 6px 0; }
+.hbar .top { display: flex; justify-content: space-between; font-size: 14px; gap: 8px; }
+.hbar .top .v { color: var(--text-2); font-variant-numeric: tabular-nums; }
+.hbar .track { height: 10px; background: var(--surface-2); border-radius: 4px; }
+.hbar .fill { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; min-width: 2px; }
+.heat { display: grid; gap: 3px; margin-top: 6px; }
+.heat .cell { aspect-ratio: 1; border-radius: 4px; background: var(--surface-2); }
+.heat .cell.on { background: var(--good); }
+.heat .cell.today { outline: 2px solid var(--text-3); outline-offset: 1px; }
+.hrow { padding: 8px 0; border-top: 1px solid var(--border); }
+.hrow:first-of-type { border-top: 0; }
+table.data { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+table.data th, table.data td { text-align: left; padding: 6px 4px; border-top: 1px solid var(--border); }
+table.data td.n, table.data th.n { text-align: right; font-variant-numeric: tabular-nums; }
+details summary { cursor: pointer; color: var(--text-2); font-size: 14px; margin-top: 8px; }
+
+/* Nav */
+nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
+nav button { flex: 1; border: 0; background: transparent; padding: 8px 0 10px; font-size: 12px; color: var(--text-3);
+  display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 60px; }
+nav button .i { font-size: 22px; }
+nav button.on { color: var(--accent); font-weight: 600; }
+
+.toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px;
+  opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 20; max-width: 90vw; text-align: center; }
+.toast.show { opacity: 1; }
+.limitline { font-size: 13px; color: var(--text-2); background: var(--surface-2); border-radius: 8px; padding: 6px 10px; margin-top: 8px; }
+.limitline.over { color: var(--text); border-left: 4px solid var(--bad); }
+.lim { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.lim:first-child { border-top: 0; }
+.lim .nm { flex: 1; }
+.lim .btn.small { min-height: 32px; padding: 2px 9px; }
+.lim select { width: auto; min-height: 36px; padding: 4px 8px; font-size: 14px; }
+.warn { background: #fff3cd; color: #5c4400; padding: 10px 12px; border-radius: 10px; font-size: 14px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="row between">
+    <h1 id="title">Heute</h1>
+  </div>
+  <div class="datenav" id="datenav">
+    <button class="icon-btn" id="prevDay" aria-label="Vorheriger Tag">‹</button>
+    <button class="btn small" id="dateLabel"></button>
+    <button class="icon-btn" id="nextDay" aria-label="Nächster Tag">›</button>
+  </div>
+</header>
+
+<main>
+  <div id="storageWarn" class="warn hidden">Speichern ist in diesem Browser nicht möglich – Einträge gehen beim Schließen verloren. Öffne die App direkt in Chrome.</div>
+
+  <!-- HEUTE -->
+  <section id="view-today">
+    <div class="card">
+      <h2>Habits</h2>
+      <div id="habitList"></div>
+      <div id="actList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Essen eintragen</h2>
+      <input type="text" id="foodName" placeholder="z. B. Vollkornbrot mit Topfen" autocomplete="off" enterkeyhint="done">
+      <div class="chips" id="recentChips" style="margin-top:8px"></div>
+      <div class="suggest" id="suggest"></div>
+
+      <div class="field">
+        <label>Kategorie</label>
+        <select id="foodCat"></select>
+      </div>
+      <div class="field">
+        <label>Bewertung</label>
+        <div class="rate" id="rateBox">
+          <button class="chip" data-r="g"><span class="dot g"></span>gut</button>
+          <button class="chip" data-r="m"><span class="dot m"></span>in Maßen</button>
+          <button class="chip" data-r="s"><span class="dot s"></span>selten</button>
+        </div>
+      </div>
+      <div class="row between field">
+        <div style="flex:1">
+          <label class="muted" style="display:block;font-size:13px;margin-bottom:4px">Mahlzeit</label>
+          <select id="foodMeal">
+            <option value="fr">Frühstück</option>
+            <option value="mi">Mittagessen</option>
+            <option value="ab">Abendessen</option>
+            <option value="sn">Snack</option>
+          </select>
+        </div>
+        <div>
+          <label class="muted" style="display:block;font-size:13px;margin-bottom:4px">Portionen</label>
+          <div class="stepper">
+            <button class="btn small" id="pMinus" aria-label="Weniger">−</button>
+            <span id="pVal">1</span>
+            <button class="btn small" id="pPlus" aria-label="Mehr">+</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn primary" id="addFood" style="width:100%;margin-top:12px">Hinzufügen</button>
+    </div>
+
+    <div class="card">
+      <div class="row between"><h2 style="margin:0">Gegessen</h2><span class="muted" id="todaySummary"></span></div>
+      <div class="stack" id="todayStack" style="margin-top:10px"></div>
+      <div id="limitWarn"></div>
+      <div id="foodList"></div>
+    </div>
+  </section>
+
+  <!-- AUSWERTUNG -->
+  <section id="view-stats" class="hidden">
+    <div class="seg" id="rangeSeg">
+      <button data-d="1">Tag</button>
+      <button data-d="7" class="on">7 Tage</button>
+      <button data-d="30">30 Tage</button>
+    </div>
+
+    <div class="card">
+      <h2>Ernährungs-Ampel</h2>
+      <div class="stack" id="statStack"></div>
+      <div class="legend" id="statLegend"></div>
+    </div>
+
+    <div class="card">
+      <div class="tiles" id="tiles"></div>
+    </div>
+
+    <div class="card">
+      <h2>Nach Kategorie (Portionen)</h2>
+      <div id="catBars"></div>
+      <details>
+        <summary>Als Tabelle anzeigen</summary>
+        <table class="data" id="catTable"></table>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Habits</h2>
+      <div id="habitStats"></div>
+    </div>
+  </section>
+
+  <!-- EINSTELLUNGEN -->
+  <section id="view-settings" class="hidden">
+    <div class="card">
+      <h2>Habits verwalten</h2>
+      <div id="habitEdit"></div>
+      <div class="row" style="margin-top:10px">
+        <input type="text" id="newHabit" placeholder="Neues Habit, z. B. Lesen">
+        <button class="btn primary" id="addHabit">+</button>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <select id="newHabitType" style="flex:1">
+          <option value="check">Abhaken (ja/nein)</option>
+          <option value="time">Mit Dauer (Minuten)</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Ziel Obst &amp; Gemüse</h2>
+      <div class="row between">
+        <span>Portionen pro Tag</span>
+        <div class="stepper">
+          <button class="btn small" id="gMinus">−</button><span id="gVal">5</span><button class="btn small" id="gPlus">+</button>
+        </div>
+      </div>
+      <p class="muted" style="margin:8px 0 0">Empfehlung: 5 Portionen täglich (3× Gemüse, 2× Obst).</p>
+    </div>
+    <div class="card">
+      <h2>Garmin-Import</h2>
+      <p class="muted" style="margin:0 0 10px">In Garmin Connect im Browser (connect.garmin.com) unter <b>Aktivitäten → Alle Aktivitäten</b> rechts oben auf <b>„CSV exportieren“</b> tippen. Die Datei dann hier importieren. Doppelte Aktivitäten werden übersprungen.</p>
+      <button class="btn primary" id="garminBtn" style="width:100%">Garmin-CSV importieren</button>
+      <input type="file" id="garminFile" accept=".csv,text/csv,text/comma-separated-values" class="hidden">
+      <div class="field">
+        <label>Aktivität hakt dieses Habit ab …</label>
+        <select id="autoMove"></select>
+      </div>
+      <div class="row between field">
+        <span style="font-size:14px">… ab Minuten pro Tag</span>
+        <div class="stepper"><button class="btn small" id="mMinus">−</button><span id="mVal">20</span><button class="btn small" id="mPlus">+</button></div>
+      </div>
+      <div class="field">
+        <label>Kraft-/HIIT-Aktivität hakt ab …</label>
+        <select id="autoStrength"></select>
+      </div>
+      <p class="muted" id="garminInfo" style="margin:10px 0 0"></p>
+    </div>
+    <div class="card">
+      <h2>Mengenlimits</h2>
+      <p class="muted" style="margin:0 0 8px">Portionen über dem Limit zählen eine Ampelstufe schlechter. 0 = kein Limit. Wochenlimits gelten rollierend über die letzten 7 Tage. Voreinstellung grob nach der österreichischen Ernährungspyramide – Orientierung, keine Ernährungsberatung.</p>
+      <div id="limitEdit"></div>
+      <button class="btn small" id="limitReset" style="margin-top:8px">Auf Standard zurücksetzen</button>
+    </div>
+    <div class="card">
+      <h2>Gelernte Zuordnungen</h2>
+      <p class="muted" style="margin:0 0 8px">Lebensmittel, deren Kategorie oder Bewertung du angepasst hast.</p>
+      <div id="learnedList"></div>
+    </div>
+    <div class="card">
+      <h2>Daten</h2>
+      <p class="muted" style="margin:0 0 10px">Alles wird nur auf diesem Gerät gespeichert. Mach ab und zu ein Backup.</p>
+      <div class="row" style="flex-wrap:wrap">
+        <button class="btn" id="exportBtn">Backup exportieren</button>
+        <button class="btn" id="importBtn">Backup importieren</button>
+        <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+      </div>
+      <button class="btn" id="resetBtn" style="margin-top:10px;color:var(--bad)">Alle Daten löschen</button>
+    </div>
+    <p class="muted" style="text-align:center">Habits &amp; Essen · v1.0 · Orientierung, keine Ernährungsberatung</p>
+  </section>
+</main>
+
+<nav>
+  <button data-v="today" class="on"><span class="i">✅</span>Heute</button>
+  <button data-v="stats"><span class="i">📊</span>Auswertung</button>
+  <button data-v="settings"><span class="i">⚙️</span>Einstellungen</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+/* ---------- Kategorien & Erkennung ---------- */
+const CATS = [
+  { id: 'gemuese',   name: 'Gemüse & Salat',            r: 'g', icon: '🥦', kw: ['gemüse','salat','tomate','paradeiser','gurke','paprika','brokkoli','karfiol','blumenkohl','karotte','möhre','zucchini','spinat','kraut','kohl','zwiebel','pilz','schwammerl','champignon','fisolen','kürbis','melanzani','aubergine','sellerie','radieschen','rote rübe','rote bete','lauch','porree','spargel','rucola','vogerlsalat','mais','gemüsesuppe','sauerkraut','avocado','ofengemüse','grillgemüse'] },
+  { id: 'obst',      name: 'Obst',                      r: 'g', icon: '🍎', kw: ['obst','apfel','äpfel','banane','birne','beeren','erdbeer','heidelbeer','himbeer','brombeer','orange','mandarine','clementine','kiwi','traube','weintraube','marille','aprikose','zwetschke','pflaume','kirsche','ananas','mango','melone','pfirsich','nektarine','grapefruit','granatapfel','feige','obstsalat'] },
+  { id: 'vollkorn',  name: 'Vollkorn & Erdäpfel',       r: 'g', icon: '🌾', kw: ['vollkorn','haferflocken','hafer','porridge','müsli','kartoffel','erdäpfel','erdapfel','quinoa','naturreis','vollkornreis','dinkel','roggen','schwarzbrot','vollkornbrot','vollkornnudeln','buchweizen','hirse','couscous vollkorn','knäckebrot','pumpernickel','ofenkartoffel','süßkartoffel'] },
+  { id: 'huelsen',   name: 'Hülsenfrüchte & Tofu',      r: 'g', icon: '🫘', kw: ['linsen','bohnen','kichererbsen','erbsen','hummus','tofu','tempeh','edamame','soja','falafel','dal','linseneintopf','chili sin carne'] },
+  { id: 'eiweiss',   name: 'Fisch, Eier & Geflügel',    r: 'g', icon: '🐟', kw: ['=ei','eier','spiegelei','rührei','omelett','fisch','lachs','thunfisch','forelle','saibling','kabeljau','hering','makrele','garnelen','shrimps','huhn','hühner','hendl','hähnchen','pute','truthahn','putenbrust','hühnerbrust','backhendl'] },
+  { id: 'milch',     name: 'Milchprodukte',             r: 'g', icon: '🥛', kw: ['joghurt','jogurt','skyr','topfen','quark','käse','milch','kefir','hüttenkäse','cottage','mozzarella','buttermilch','feta','parmesan','frischkäse','griechisches joghurt','proteinpudding'] },
+  { id: 'nuesse',    name: 'Nüsse & Samen',             r: 'g', icon: '🥜', kw: ['nüsse','nuss','mandel','walnuss','haselnuss','cashew','erdnuss','pistazie','samen','leinsamen','chia','kerne','kürbiskerne','sonnenblumenkerne','erdnussbutter','studentenfutter'] },
+  { id: 'getraenke', name: 'Wasser, Tee & Kaffee',      r: 'g', icon: '💧', kw: ['wasser','mineral','tee','kaffee','espresso','cappuccino','melange','verlängerter','sodawasser','soda zitron'] },
+  { id: 'weissmehl', name: 'Weißmehl, Reis & Pasta',    r: 'm', icon: '🍞', kw: ['semmel','weißbrot','toast','nudeln','pasta','spaghetti','penne','reis','gnocchi','knödel','baguette','weckerl','kipferl','brezel','breze','mischbrot','bauernbrot','brot','couscous','wrap','tortilla','cornflakes','salzstangerl'] },
+  { id: 'fleisch',   name: 'Rotes Fleisch & Wurst',     r: 'm', icon: '🥩', kw: ['schwein','rind','faschiert','wurst','schinken','speck','salami','leberkäse','leberkäs','würstel','frankfurter','käsekrainer','bratwurst','schnitzel','gulasch','kotelett','steak','tafelspitz','schweinsbraten','braten','cevapcici','extrawurst','lamm','kalb','beef','leberwurst','blunzen'] },
+  { id: 'fett',      name: 'Butter, Öl & Saucen',       r: 'm', icon: '🧈', kw: ['butter','öl','mayo','mayonnaise','majonäse','sauce','soße','dressing','sahne','schlagobers','obers','rahm','sauerrahm','ketchup','pesto','margarine','schmalz','aufstrich','liptauer'] },
+  { id: 'fertig',    name: 'Fast Food & Fertiggerichte',r: 's', icon: '🍕', kw: ['pizza','burger','pommes','döner','kebab','kebap','fertiggericht','tiefkühl','nuggets','hot dog','hotdog','instant','mikrowelle','lasagne','currywurst','fast food','mcdonald','burger king','frühlingsrolle','bosna','fischstäbchen','cordon bleu','wiener schnitzel paniert','tiefkühlpizza'] },
+  { id: 'suess',     name: 'Süßes & Mehlspeisen',       r: 's', icon: '🍰', kw: ['schoko','schokolade','kuchen','torte','keks','kekse','=eis','speiseeis','gummibär','zucker','mehlspeise','strudel','krapfen','nutella','marmelade','croissant','plunder','schnitte','manner','palatschinke','kaiserschmarrn','sachertorte','süßigkeit','dessert','pudding','riegel','müsliriegel','donut','muffin','waffel','lebkuchen','honig','germknödel','marillenknödel','topfenstrudel','apfelstrudel','tiramisu','bonbon','praline','mozartkugel','cookie','brownie'] },
+  { id: 'snacks',    name: 'Salzige Snacks',            r: 's', icon: '🥨', kw: ['chips','kartoffelchips','soletti','popcorn','cracker','nachos','flips','erdnussflips','salzbrezel','knabber','tortillachips'] },
+  { id: 'softdrinks',name: 'Zuckergetränke & Säfte',    r: 's', icon: '🥤', kw: ['cola','limo','limonade','saft','apfelsaft','orangensaft','fruchtsaft','eistee','energy','red bull','fanta','sprite','almdudler','gespritzt','smoothie','kakao','eiskaffee','frappé','milchshake','sirup','himbeersaft','frucade'] },
+  { id: 'alkohol',   name: 'Alkohol',                   r: 's', icon: '🍺', kw: ['bier','wein','spritzer','sekt','prosecco','schnaps','cocktail','radler','gin','whisky','wodka','vodka','rum','aperol','hugo','likör','obstler','zirbe','jägermeister','glühwein','punsch','most','sturm','cider','champagner','weißwein','rotwein'] },
+  { id: 'sonstiges', name: 'Sonstiges',                 r: 'm', icon: '🍽️', kw: [] }
+];
+const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+const RATING = {
+  g: { label: 'gut', long: 'Empfehlenswert', color: 'var(--good)' },
+  m: { label: 'in Maßen', long: 'In Maßen', color: 'var(--mid)' },
+  s: { label: 'selten', long: 'Eher selten', color: 'var(--bad)' }
+};
+const MEALS = { fr: 'Frühstück', mi: 'Mittagessen', ab: 'Abendessen', sn: 'Snack' };
+
+// Mengenlimits (grobe Orientierung an der österr. Ernährungspyramide).
+// Portionen über dem Limit rutschen eine Ampelstufe nach unten (gut -> in Maßen -> selten).
+// per: 'd' = pro Tag, 'w' = rollierend über 7 Tage. n = 0 heißt: kein Limit.
+const DEFAULT_LIMITS = {
+  gemuese:   { n: 0, per: 'd' },
+  obst:      { n: 3, per: 'd' },
+  vollkorn:  { n: 4, per: 'd' },
+  huelsen:   { n: 0, per: 'd' },
+  eiweiss:   { n: 2, per: 'd' },
+  milch:     { n: 3, per: 'd' },
+  nuesse:    { n: 1, per: 'd' },
+  getraenke: { n: 0, per: 'd' },
+  weissmehl: { n: 2, per: 'd' },
+  fleisch:   { n: 3, per: 'w' },
+  fett:      { n: 2, per: 'd' },
+  fertig:    { n: 1, per: 'w' },
+  suess:     { n: 1, per: 'd' },
+  snacks:    { n: 2, per: 'w' },
+  softdrinks:{ n: 2, per: 'w' },
+  alkohol:   { n: 2, per: 'w' },
+  sonstiges: { n: 0, per: 'd' }
+};
+const DOWN = { g: 'm', m: 's', s: 's' };
+const PER_LABEL = { d: 'pro Tag', w: 'pro Woche' };
+
+// Vorbereitete Keyword-Liste: längster Treffer gewinnt (z. B. "Vollkornnudeln" -> Vollkorn statt Pasta)
+const KEYWORDS = [];
+CATS.forEach(c => c.kw.forEach(k => {
+  const exact = k.startsWith('=');
+  KEYWORDS.push({ k: exact ? k.slice(1) : k, exact, cat: c.id });
+}));
+
+function norm(s) { return s.toLowerCase().trim().replace(/\s+/g, ' '); }
+
+function detect(name) {
+  const n = norm(name);
+  if (!n) return null;
+  const learned = state.learned[n];
+  if (learned) return { cat: learned.cat, r: learned.r, src: 'gelernt' };
+  const words = n.split(/[^a-zäöüß]+/).filter(Boolean);
+  let best = null;
+  for (const e of KEYWORDS) {
+    const hit = e.exact ? words.includes(e.k) : n.includes(e.k);
+    if (hit && (!best || e.k.length > best.k.length)) best = e;
+  }
+  // Teilweise gelernte Treffer (z. B. "Vollkornweckerl groß" enthält gelerntes "vollkornweckerl")
+  for (const key in state.learned) {
+    if (key.length >= 4 && n.includes(key) && (!best || key.length > best.k.length)) {
+      best = { k: key, cat: state.learned[key].cat, r: state.learned[key].r, learned: true };
+    }
+  }
+  if (!best) return null;
+  return { cat: best.cat, r: best.r || CAT[best.cat].r, src: best.learned ? 'gelernt' : 'erkannt' };
+}
+
+/* ---------- Speicher ---------- */
+const KEY = 'habits-essen.v1';
+const DEFAULT_HABITS = [
+  { id: 'h1', name: '🚶 Walking Pad / Bewegung' },
+  { id: 'h2', name: '💪 Krafttraining' },
+  { id: 'h3', name: '💧 2 Liter Wasser' },
+  { id: 'h4', name: '😴 7 Stunden Schlaf' },
+  { id: 'h5', name: '🚫 Kein Alkohol' },
+  { id: 'h6', name: '🎸 Instrument üben', type: 'time', goal: 20 }
+];
+const isTime = h => h.type === 'time';
+function freshState() {
+  return { habits: DEFAULT_HABITS.slice(), checks: {}, foods: {}, learned: {}, goalFV: 5, limits: {},
+    minutes: {}, activities: {}, auto: { move: 'h1', moveMin: 20, strength: 'h2' } };
+}
+let storageOk = true;
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return freshState();
+    return Object.assign(freshState(), JSON.parse(raw));
+  } catch (e) { storageOk = false; return freshState(); }
+}
+function save() {
+  evalCache.clear();
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch (e) { storageOk = false; showWarn(); }
+}
+let state = load();
+
+/* ---------- Datum ---------- */
+function iso(d) { const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return z.toISOString().slice(0, 10); }
+function addDays(isoStr, n) { const d = new Date(isoStr + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d); }
+const todayIso = () => iso(new Date());
+let curDay = todayIso();
+function dayLabel(isoStr) {
+  const t = todayIso();
+  if (isoStr === t) return 'Heute';
+  if (isoStr === addDays(t, -1)) return 'Gestern';
+  return new Date(isoStr + 'T12:00:00').toLocaleDateString('de-AT', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+/* ---------- Helfer ---------- */
+const $ = id => document.getElementById(id);
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'style') e.style.cssText = v;
+    else e.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => e.append(c instanceof Node ? c : document.createTextNode(c)));
+  return e;
+}
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); }
+function showWarn() { $('storageWarn').classList.toggle('hidden', storageOk); }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const fmt = n => (Math.round(n * 10) / 10).toLocaleString('de-AT');
+
+/* ---------- Mengen-/Häufigkeitslogik ---------- */
+function limitOf(cat) { return Object.assign({}, DEFAULT_LIMITS[cat] || { n: 0, per: 'd' }, state.limits[cat] || {}); }
+
+// Bewertet alle Einträge eines Tages unter Berücksichtigung dessen, was vorher (am Tag bzw. in den 6 Tagen davor) gegessen wurde.
+// Ergebnis je Eintrag: { within, over, base, down, lim, used }
+const evalCache = new Map();
+function evalDay(day) {
+  if (evalCache.has(day)) return evalCache.get(day);
+  const res = {};
+  const list = (state.foods[day] || []).slice().sort((a, b) => a.t - b.t);
+  const used = {}; // bisher verbrauchte Portionen je Kategorie im jeweiligen Fenster
+  const prior = cat => {
+    if (used[cat] !== undefined) return used[cat];
+    const lim = limitOf(cat);
+    let s = 0;
+    if (lim.per === 'w') for (let i = 1; i <= 6; i++) (state.foods[addDays(day, -i)] || []).forEach(f => { if (f.cat === cat) s += f.portions; });
+    return (used[cat] = s);
+  };
+  list.forEach(f => {
+    const lim = limitOf(f.cat);
+    const before = prior(f.cat);
+    let within = f.portions, over = 0;
+    if (lim.n > 0) { within = Math.max(0, Math.min(f.portions, lim.n - before)); over = f.portions - within; }
+    used[f.cat] = before + f.portions;
+    res[f.id] = { within, over, base: f.r, down: DOWN[f.r], lim, used: used[f.cat] };
+  });
+  evalCache.set(day, res);
+  return res;
+}
+function totalsForDays(days) {
+  const t = { g: 0, m: 0, s: 0, over: 0 };
+  days.forEach(d => {
+    const ev = evalDay(d);
+    Object.values(ev).forEach(e => { t[e.base] += e.within; t[e.down] += e.over; t.over += e.over; });
+  });
+  return t;
+}
+
+function streak(habitId, fromDay) {
+  let d = fromDay, n = 0;
+  if (!(state.checks[d] || []).includes(habitId)) d = addDays(d, -1); // heute noch offen -> ab gestern zählen
+  while ((state.checks[d] || []).includes(habitId)) { n++; d = addDays(d, -1); }
+  return n;
+}
+
+/* ---------- Ansicht: Heute ---------- */
+function renderHabits() {
+  const box = $('habitList'); box.innerHTML = '';
+  if (!state.habits.length) { box.append(el('div', { class: 'empty' }, 'Keine Habits – unter Einstellungen hinzufügen.')); return; }
+  const done = state.checks[curDay] || [];
+  state.habits.forEach(h => {
+    const on = done.includes(h.id);
+    const s = streak(h.id, todayIso());
+    const row = el('div', { class: 'habit' },
+      el('button', { class: 'check' + (on ? ' on' : ''), 'aria-label': h.name + (on ? ' erledigt' : ' offen'), onclick: () => toggleHabit(h.id) }, on ? '✓' : ''),
+      el('div', { class: 'name' }, h.name,
+        isTime(h) ? el('div', { class: 'muted' }, `${fmt(getMin(curDay, h.id))} / ${h.goal} min`) : ''),
+      el('div', { class: 'streak' }, s ? '🔥 ' + s : '')
+    );
+    box.append(row);
+    if (isTime(h)) {
+      const inp = el('input', { type: 'number', inputmode: 'numeric', min: '0', max: '600', value: String(getMin(curDay, h.id) || ''), placeholder: 'min', 'aria-label': 'Minuten ' + h.name, style: 'width:76px;min-height:36px;padding:4px 8px' });
+      inp.addEventListener('change', () => setMin(h.id, parseFloat(inp.value.replace(',', '.')) || 0));
+      box.append(el('div', { class: 'row', style: 'padding:0 4px 10px 50px;gap:6px' },
+        el('button', { class: 'btn small', onclick: () => setMin(h.id, getMin(curDay, h.id) + 5) }, '+5'),
+        el('button', { class: 'btn small', onclick: () => setMin(h.id, getMin(curDay, h.id) + 15) }, '+15'),
+        el('button', { class: 'btn small', onclick: () => setMin(h.id, getMin(curDay, h.id) + 30) }, '+30'),
+        inp, el('span', { class: 'muted' }, 'min')));
+    }
+  });
+}
+function getMin(day, id) { return (state.minutes[day] || {})[id] || 0; }
+function setMin(id, v) {
+  const h = state.habits.find(x => x.id === id);
+  v = Math.max(0, Math.min(600, Math.round(v)));
+  const m = state.minutes[curDay] = state.minutes[curDay] || {};
+  if (v) m[id] = v; else delete m[id];
+  if (!Object.keys(m).length) delete state.minutes[curDay];
+  // erledigt, sobald das Tagesziel erreicht ist (ohne Ziel: sobald > 0 min)
+  setCheck(id, h && h.goal ? v >= h.goal : v > 0);
+  save(); renderHabits();
+}
+function setCheck(id, on) {
+  const arr = state.checks[curDay] = state.checks[curDay] || [];
+  const i = arr.indexOf(id);
+  if (on && i < 0) arr.push(id);
+  if (!on && i >= 0) arr.splice(i, 1);
+  if (!arr.length) delete state.checks[curDay];
+}
+function toggleHabit(id) {
+  const h = state.habits.find(x => x.id === id);
+  const on = (state.checks[curDay] || []).includes(id);
+  if (h && isTime(h)) { setMin(id, on ? 0 : Math.max(h.goal || 0, getMin(curDay, id))); return; }
+  setCheck(id, !on);
+  save(); renderHabits();
+}
+
+let form = { cat: '', r: '', portions: 1, manualCat: false, manualR: false };
+function defaultMeal() {
+  const h = new Date().getHours();
+  return h < 10 ? 'fr' : h < 15 ? 'mi' : h < 17 ? 'sn' : 'ab';
+}
+function fillCatSelect() {
+  const s = $('foodCat'); s.innerHTML = '';
+  s.append(el('option', { value: '' }, '– bitte wählen –'));
+  CATS.forEach(c => s.append(el('option', { value: c.id }, c.icon + ' ' + c.name)));
+}
+function setRating(r) {
+  form.r = r;
+  document.querySelectorAll('#rateBox .chip').forEach(b => b.classList.toggle('sel', b.dataset.r === r));
+}
+function updateSuggestion() {
+  const name = $('foodName').value;
+  const det = detect(name);
+  if (!form.manualCat) { form.cat = det ? det.cat : ''; $('foodCat').value = form.cat; }
+  if (!form.manualR) setRating(det ? det.r : (form.cat ? CAT[form.cat].r : ''));
+  const sug = $('suggest');
+  if (!norm(name)) sug.textContent = '';
+  else if (det && !form.manualCat) sug.textContent = (det.src === 'gelernt' ? '🧠 Gemerkt: ' : '✨ Erkannt: ') + CAT[det.cat].icon + ' ' + CAT[det.cat].name;
+  else if (!det && !form.cat) sug.textContent = '❓ Nicht erkannt – bitte Kategorie wählen (wird gemerkt).';
+  else sug.textContent = '';
+}
+function renderRecent() {
+  // häufigste Lebensmittel der letzten 30 Tage
+  const counts = {};
+  for (let i = 0; i < 30; i++) {
+    (state.foods[addDays(todayIso(), -i)] || []).forEach(f => {
+      const k = norm(f.name);
+      counts[k] = counts[k] || { n: 0, f };
+      counts[k].n++;
+    });
+  }
+  const top = Object.values(counts).sort((a, b) => b.n - a.n).slice(0, 8);
+  const box = $('recentChips'); box.innerHTML = '';
+  top.forEach(({ f }) => box.append(el('button', { class: 'chip', onclick: () => {
+    $('foodName').value = f.name;
+    form.manualCat = false; form.manualR = false;
+    updateSuggestion();
+  } }, el('span', { class: 'dot ' + f.r }), f.name)));
+}
+function addFood() {
+  const name = $('foodName').value.trim();
+  if (!name) { toast('Bitte ein Lebensmittel eingeben'); $('foodName').focus(); return; }
+  if (!form.cat) { toast('Bitte eine Kategorie wählen'); $('foodCat').focus(); return; }
+  const r = form.r || CAT[form.cat].r;
+  const entry = { id: uid(), name, cat: form.cat, r, meal: $('foodMeal').value, portions: form.portions, t: Date.now() };
+  (state.foods[curDay] = state.foods[curDay] || []).push(entry);
+  // Lernen, wenn vom Automatismus abweichend oder unbekannt
+  const n = norm(name);
+  const auto = (() => { const tmp = state.learned[n]; delete state.learned[n]; const d = detect(name); if (tmp) state.learned[n] = tmp; return d; })();
+  if (!auto || auto.cat !== form.cat || auto.r !== r) state.learned[n] = { cat: form.cat, r };
+  save();
+  $('foodName').value = ''; form = { cat: '', r: '', portions: 1, manualCat: false, manualR: false };
+  $('pVal').textContent = '1'; $('foodCat').value = ''; setRating(''); $('suggest').textContent = '';
+  const ev = evalDay(curDay)[entry.id];
+  if (ev && ev.over > 0) {
+    toast(`⚠️ ${CAT[entry.cat].name}: Limit ${ev.lim.n} ${PER_LABEL[ev.lim.per]} überschritten – zählt als „${RATING[ev.down].label}“`);
+  } else if (ev && ev.lim.n > 0 && ev.used >= ev.lim.n) {
+    toast(`${CAT[entry.cat].icon} eingetragen – Limit für ${CAT[entry.cat].name} ${PER_LABEL[ev.lim.per]} jetzt erreicht`);
+  } else toast(CAT[entry.cat].icon + ' ' + name + ' eingetragen');
+  renderFoods(); renderRecent();
+}
+function delFood(id) {
+  const arr = state.foods[curDay] || [];
+  const i = arr.findIndex(f => f.id === id);
+  if (i < 0) return;
+  const [removed] = arr.splice(i, 1);
+  if (!arr.length) delete state.foods[curDay];
+  save(); renderFoods(); renderRecent();
+  toast('„' + removed.name + '“ entfernt');
+}
+function drawStack(node, t) {
+  node.innerHTML = '';
+  const sum = t.g + t.m + t.s;
+  if (!sum) { node.style.background = 'var(--surface-2)'; return; }
+  node.style.background = 'var(--surface)';
+  ['g', 'm', 's'].forEach(k => {
+    if (!t[k]) return;
+    node.append(el('div', { style: `flex:${t[k]};background:${RATING[k].color}`, title: `${RATING[k].long}: ${fmt(t[k])} Portionen (${Math.round(t[k] / sum * 100)} %)` }));
+  });
+}
+function renderFoods() {
+  const list = state.foods[curDay] || [];
+  const box = $('foodList'); box.innerHTML = '';
+  const t = totalsForDays([curDay]);
+  drawStack($('todayStack'), t);
+  const sum = t.g + t.m + t.s;
+  $('todaySummary').textContent = sum ? `🟢 ${fmt(t.g)} · 🟡 ${fmt(t.m)} · 🔴 ${fmt(t.s)}` : '';
+  // Hinweis auf erreichte / überschrittene Limits
+  const ev = evalDay(curDay);
+  const warn = $('limitWarn'); warn.innerHTML = '';
+  const seen = {};
+  list.forEach(f => {
+    const e = ev[f.id]; if (!e || !e.lim.n) return;
+    seen[f.cat] = { used: Math.max(seen[f.cat]?.used || 0, e.used), lim: e.lim };
+  });
+  Object.entries(seen).filter(([, s]) => s.used >= s.lim.n).forEach(([cat, s]) => {
+    const overBy = s.used - s.lim.n;
+    warn.append(el('div', { class: 'limitline' + (overBy > 0 ? ' over' : '') },
+      (overBy > 0 ? '⚠️ ' : 'ℹ️ ') + CAT[cat].icon + ' ' + CAT[cat].name + ': ' + fmt(s.used) + ' von ' + s.lim.n + ' ' + PER_LABEL[s.lim.per] +
+      (overBy > 0 ? ' – Überschuss zählt eine Stufe schlechter' : ' – Limit erreicht')));
+  });
+  if (!list.length) { box.append(el('div', { class: 'empty', style: 'margin-top:8px' }, 'Noch nichts eingetragen.')); return; }
+  Object.keys(MEALS).forEach(m => {
+    const items = list.filter(f => f.meal === m);
+    if (!items.length) return;
+    box.append(el('div', { class: 'mealhead' }, MEALS[m]));
+    items.forEach(f => {
+      const e = ev[f.id] || { over: 0, base: f.r, down: f.r };
+      const eff = e.over > 0 ? e.down : f.r;
+      const sub = CAT[f.cat].icon + ' ' + CAT[f.cat].name + ' · ' + RATING[f.r].label +
+        (e.over > 0 ? ` → ${fmt(e.over)} über Limit: ${RATING[e.down].label}` : '');
+      box.append(el('div', { class: 'food' },
+        el('span', { class: 'dot ' + eff, title: RATING[eff].long }),
+        el('div', { class: 'info' },
+          el('div', {}, (e.over > 0 ? '⚠️ ' : '') + f.name + (f.portions !== 1 ? ` × ${fmt(f.portions)}` : '')),
+          el('div', { class: 'muted' }, sub)),
+        el('button', { class: 'icon-btn', 'aria-label': 'Löschen', onclick: () => delFood(f.id) }, '🗑️')
+      ));
+    });
+  });
+}
+
+/* ---------- Ansicht: Auswertung ---------- */
+let range = 7;
+function rangeDays() {
+  const end = range === 1 ? curDay : todayIso();
+  return Array.from({ length: range }, (_, i) => addDays(end, -(range - 1 - i)));
+}
+function renderStats() {
+  const days = rangeDays();
+  const foods = days.flatMap(d => state.foods[d] || []);
+  const t = totalsForDays(days);
+  const sum = t.g + t.m + t.s;
+  drawStack($('statStack'), t);
+  const lg = $('statLegend'); lg.innerHTML = '';
+  ['g', 'm', 's'].forEach(k => lg.append(el('span', {},
+    el('span', { class: 'dot ' + k, style: 'margin-right:6px' }), RATING[k].long + ' ',
+    el('b', {}, sum ? Math.round(t[k] / sum * 100) + ' %' : '–'))));
+
+  // Kacheln
+  const fvPerDay = days.map(d => (state.foods[d] || []).filter(f => f.cat === 'gemuese' || f.cat === 'obst').reduce((a, f) => a + f.portions, 0));
+  const loggedDays = days.filter(d => (state.foods[d] || []).length).length;
+  const avgFV = loggedDays ? fvPerDay.reduce((a, b) => a + b, 0) / loggedDays : 0;
+  const goalDays = fvPerDay.filter(v => v >= state.goalFV).length;
+  const habitTotal = days.reduce((a, d) => a + (state.checks[d] || []).filter(id => state.habits.some(h => h.id === id)).length, 0);
+  const habitRate = state.habits.length ? habitTotal / (state.habits.length * days.length) : 0;
+  const tiles = $('tiles'); tiles.innerHTML = '';
+  const tile = (big, lbl) => el('div', { class: 'tile' }, el('div', { class: 'big' }, big), el('div', { class: 'lbl' }, lbl));
+  tiles.append(
+    tile(sum ? Math.round(t.g / sum * 100) + ' %' : '–', '🟢 Anteil gut'),
+    tile(loggedDays ? fmt(avgFV) : '–', `🥦🍎 Obst & Gemüse Ø/Tag (Ziel ${state.goalFV})`),
+    tile(range === 1 ? (fvPerDay[0] >= state.goalFV ? '✓' : '–') : `${goalDays}/${days.length}`, 'Tage mit Obst-&-Gemüse-Ziel'),
+    tile(Math.round(habitRate * 100) + ' %', '✅ Habits erledigt'),
+    tile(t.over ? '⚠️ ' + fmt(t.over) : '0', 'Portionen über Limit (eine Stufe schlechter gewertet)'),
+    tile(fmt(days.reduce((a, d) => a + (state.activities[d] || []).reduce((x, y) => x + y.min, 0), 0)) + ' min', '🏃 Aktivität (Garmin-Import)')
+  );
+
+  // Balken je Kategorie (eine Farbe = Menge; Ampel als Punkt + Text)
+  const byCat = {};
+  foods.forEach(f => { byCat[f.cat] = (byCat[f.cat] || 0) + f.portions; });
+  const rows = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+  const max = rows.length ? rows[0][1] : 1;
+  const bars = $('catBars'); bars.innerHTML = '';
+  const table = $('catTable'); table.innerHTML = '';
+  if (!rows.length) bars.append(el('div', { class: 'empty' }, 'Keine Einträge in diesem Zeitraum.'));
+  else table.append(el('tr', {}, el('th', {}, 'Kategorie'), el('th', {}, 'Bewertung'), el('th', { class: 'n' }, 'Portionen'), el('th', { class: 'n' }, 'Anteil')));
+  rows.forEach(([cat, v]) => {
+    const c = CAT[cat];
+    const lim = limitOf(cat);
+    // Limit auf den Zeitraum hochgerechnet (Tag-Limit × Tage, Wochen-Limit × Tage/7)
+    const cap = lim.n ? (lim.per === 'd' ? lim.n * days.length : lim.n * days.length / 7) : 0;
+    const limTxt = lim.n ? ` / max. ${fmt(cap)}` : '';
+    bars.append(el('div', { class: 'hbar', title: `${c.name}: ${fmt(v)} Portionen` + (lim.n ? ` (Limit ${lim.n} ${PER_LABEL[lim.per]})` : '') },
+      el('div', { class: 'top' },
+        el('span', {}, el('span', { class: 'dot ' + c.r, style: 'margin-right:6px' }), c.icon + ' ' + c.name),
+        el('span', { class: 'v' }, (cap && v > cap ? '⚠️ ' : '') + fmt(v) + limTxt)),
+      el('div', { class: 'track' }, el('div', { class: 'fill', style: `width:${v / max * 100}%` }))));
+    table.append(el('tr', {}, el('td', {}, c.icon + ' ' + c.name), el('td', {}, RATING[c.r].label),
+      el('td', { class: 'n' }, fmt(v)), el('td', { class: 'n' }, Math.round(v / sum * 100) + ' %')));
+  });
+
+  // Habits: Quote, Streak, Kalender-Kacheln
+  const hs = $('habitStats'); hs.innerHTML = '';
+  if (!state.habits.length) hs.append(el('div', { class: 'empty' }, 'Keine Habits angelegt.'));
+  const cols = range === 30 ? 15 : range;
+  state.habits.forEach(h => {
+    const doneDays = days.filter(d => (state.checks[d] || []).includes(h.id));
+    const heat = el('div', { class: 'heat', style: `grid-template-columns:repeat(${cols},1fr);max-width:${range === 1 ? '34px' : '100%'}` });
+    days.forEach(d => {
+      const on = doneDays.includes(d);
+      heat.append(el('div', { class: 'cell' + (on ? ' on' : '') + (d === todayIso() ? ' today' : ''),
+        title: `${dayLabel(d)}: ${on ? 'erledigt' : 'offen'}`,
+        onclick: () => toast(`${h.name} – ${dayLabel(d)}: ${on ? 'erledigt ✓' : 'offen'}`) }));
+    });
+    hs.append(el('div', { class: 'hrow' },
+      el('div', { class: 'row between' }, el('span', {}, h.name),
+        el('span', { class: 'muted' }, `${doneDays.length}/${days.length}` +
+          (isTime(h) ? ` · ${fmt(days.reduce((a, d) => a + getMin(d, h.id), 0))} min` : '') +
+          (streak(h.id, todayIso()) ? ` · 🔥 ${streak(h.id, todayIso())}` : ''))),
+      heat));
+  });
+}
+
+/* ---------- Ansicht: Einstellungen ---------- */
+function renderSettings() {
+  const box = $('habitEdit'); box.innerHTML = '';
+  state.habits.forEach((h, i) => {
+    const inp = el('input', { type: 'text', value: h.name, 'aria-label': 'Habit-Name' });
+    inp.addEventListener('change', () => { const v = inp.value.trim(); if (v) { h.name = v; save(); } else inp.value = h.name; });
+    box.append(el('div', { class: 'row', style: 'margin-bottom:6px' }, inp,
+      el('button', { class: 'icon-btn', 'aria-label': 'Nach oben', onclick: () => { if (i) { [state.habits[i - 1], state.habits[i]] = [state.habits[i], state.habits[i - 1]]; save(); renderSettings(); } } }, '↑'),
+      el('button', { class: 'icon-btn', 'aria-label': 'Löschen', onclick: () => {
+        if (confirmTwice('h' + h.id, `„${h.name}“ löschen? Nochmal tippen zum Bestätigen.`)) { state.habits.splice(i, 1); save(); renderSettings(); }
+      } }, '🗑️')));
+    if (isTime(h)) {
+      const setG = g => { h.goal = Math.max(0, Math.min(300, g)); save(); renderSettings(); };
+      box.append(el('div', { class: 'row', style: 'margin:-2px 0 10px 4px;gap:6px;font-size:14px' },
+        el('span', { class: 'muted', style: 'flex:1' }, '⏱️ Tagesziel'),
+        el('button', { class: 'btn small', onclick: () => setG((h.goal || 0) - 5) }, '−'),
+        el('span', { style: 'min-width:54px;text-align:center;font-weight:600' }, (h.goal || 0) + ' min'),
+        el('button', { class: 'btn small', onclick: () => setG((h.goal || 0) + 5) }, '+')));
+    }
+  });
+  $('gVal').textContent = state.goalFV;
+
+  // Garmin-Zuordnung
+  ['autoMove', 'autoStrength'].forEach(id => {
+    const s = $(id); s.innerHTML = '';
+    s.append(el('option', { value: '' }, '– nichts abhaken –'));
+    state.habits.forEach(h => s.append(el('option', { value: h.id }, h.name)));
+    s.value = (id === 'autoMove' ? state.auto.move : state.auto.strength) || '';
+  });
+  $('mVal').textContent = state.auto.moveMin;
+  const nAct = Object.values(state.activities).reduce((a, l) => a + l.length, 0);
+  const actDays = Object.keys(state.activities).sort();
+  $('garminInfo').textContent = nAct ? `${nAct} Aktivitäten gespeichert (${dayLabel(actDays[0])} – ${dayLabel(actDays[actDays.length - 1])}).` : 'Noch keine Aktivitäten importiert.';
+
+  // Limits
+  const le = $('limitEdit'); le.innerHTML = '';
+  CATS.forEach(c => {
+    const lim = limitOf(c.id);
+    const val = el('span', { style: 'min-width:24px;text-align:center;font-weight:600' }, lim.n ? String(lim.n) : '–');
+    const setN = n => { state.limits[c.id] = { n: Math.max(0, Math.min(20, n)), per: limitOf(c.id).per }; save(); renderSettings(); };
+    const per = el('select', { 'aria-label': 'Zeitraum' }, el('option', { value: 'd' }, '/Tag'), el('option', { value: 'w' }, '/Woche'));
+    per.value = lim.per;
+    per.addEventListener('change', () => { state.limits[c.id] = { n: limitOf(c.id).n, per: per.value }; save(); });
+    le.append(el('div', { class: 'lim' },
+      el('span', { class: 'dot ' + c.r }),
+      el('span', { class: 'nm' }, c.icon + ' ' + c.name),
+      el('button', { class: 'btn small', onclick: () => setN(lim.n - 1), 'aria-label': 'Weniger' }, '−'), val,
+      el('button', { class: 'btn small', onclick: () => setN(lim.n + 1), 'aria-label': 'Mehr' }, '+'), per));
+  });
+
+  const ll = $('learnedList'); ll.innerHTML = '';
+  const keys = Object.keys(state.learned).sort();
+  if (!keys.length) ll.append(el('div', { class: 'empty' }, 'Noch nichts gelernt.'));
+  keys.forEach(k => {
+    const l = state.learned[k];
+    ll.append(el('div', { class: 'food' }, el('span', { class: 'dot ' + l.r }),
+      el('div', { class: 'info' }, el('div', {}, k), el('div', { class: 'muted' }, CAT[l.cat].icon + ' ' + CAT[l.cat].name + ' · ' + RATING[l.r].label)),
+      el('button', { class: 'icon-btn', 'aria-label': 'Vergessen', onclick: () => { delete state.learned[k]; save(); renderSettings(); } }, '✕')));
+  });
+}
+// Bestätigung ohne Browser-Dialog: zweimal tippen innerhalb von 3 s
+const pending = {};
+function confirmTwice(key, msg) {
+  if (pending[key] && Date.now() - pending[key] < 3000) { delete pending[key]; return true; }
+  pending[key] = Date.now(); toast(msg); return false;
+}
+
+/* ---------- Garmin-CSV-Import ---------- */
+function parseCSV(text) {
+  text = text.replace(/^﻿/, '');
+  const first = text.split(/\r?\n/)[0] || '';
+  const delim = (first.match(/;/g) || []).length > (first.match(/,/g) || []).length ? ';' : ',';
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+      else cur += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === delim) { row.push(cur); cur = ''; }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++;
+      row.push(cur); cur = ''; if (row.some(c => c.trim())) rows.push(row); row = [];
+    } else cur += ch;
+  }
+  row.push(cur); if (row.some(c => c.trim())) rows.push(row);
+  return rows;
+}
+function parseGarminDate(s) {
+  s = s.trim();
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+  if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); // US-Format M/D/YYYY
+  if (m) return `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`;
+  return null;
+}
+function parseDuration(s) {
+  s = (s || '').trim();
+  if (!s || s === '--') return 0;
+  const p = s.split(':').map(x => parseFloat(x.replace(',', '.')));
+  if (p.some(isNaN)) return 0;
+  if (p.length === 3) return p[0] * 60 + p[1] + p[2] / 60;
+  if (p.length === 2) return p[0] + p[1] / 60;
+  return p[0];
+}
+function importGarmin(text) {
+  const rows = parseCSV(text);
+  if (rows.length < 2) throw new Error('keine Daten gefunden');
+  const head = rows[0].map(h => h.trim().toLowerCase());
+  const find = (...res) => { for (const re of res) { const i = head.findIndex(h => re.test(h)); if (i >= 0) return i; } return -1; };
+  const iDate = find(/^datum$/, /^date$/, /datum/, /date/);
+  const iType = find(/activity type/, /aktivitätstyp/, /aktivitätsart/, /^typ/, /type/);
+  const iTitle = find(/^title$/, /^titel$/, /title|titel|name/);
+  const iTime = find(/^time$/, /^zeit$/, /^dauer$/, /^duration$/, /elapsed time|verstrichene zeit/, /moving time|bewegungszeit/);
+  const iCal = find(/^calories$/, /^kalorien$/, /calor|kalor/);
+  if (iDate < 0) throw new Error('Spalte „Datum“ fehlt – ist das ein Garmin-Aktivitäten-Export?');
+  let added = 0, dupes = 0, checked = 0;
+  const touched = new Set();
+  rows.slice(1).forEach(r => {
+    const day = parseGarminDate(r[iDate] || '');
+    if (!day) return;
+    const type = iType >= 0 ? (r[iType] || '').trim() : '';
+    const title = iTitle >= 0 ? (r[iTitle] || '').trim() : '';
+    const min = Math.round(iTime >= 0 ? parseDuration(r[iTime]) : 0);
+    const kcal = iCal >= 0 ? parseInt((r[iCal] || '').replace(/[^\d]/g, ''), 10) || 0 : 0;
+    const key = (r[iDate] || '').trim() + '|' + type + '|' + title;
+    const list = state.activities[day] = state.activities[day] || [];
+    if (list.some(a => a.key === key)) { dupes++; return; }
+    list.push({ key, type, title, min, kcal });
+    added++; touched.add(day);
+  });
+  // Habits automatisch abhaken
+  const strengthRe = /kraft|strength|hiit|fitnessstudio|gym|cardio-?training|bodyweight|eigengewicht/i;
+  touched.forEach(day => {
+    const acts = state.activities[day];
+    const arr = state.checks[day] = state.checks[day] || [];
+    const tick = id => { if (id && state.habits.some(h => h.id === id) && !arr.includes(id)) { arr.push(id); checked++; } };
+    if (acts.reduce((a, x) => a + x.min, 0) >= state.auto.moveMin) tick(state.auto.move);
+    if (acts.some(a => strengthRe.test(a.type + ' ' + a.title))) tick(state.auto.strength);
+    if (!arr.length) delete state.checks[day];
+  });
+  return { added, dupes, checked };
+}
+function renderActivities() {
+  const box = $('actList'); box.innerHTML = '';
+  const acts = state.activities[curDay] || [];
+  if (!acts.length) return;
+  box.append(el('div', { class: 'mealhead' }, '🏃 Garmin-Aktivitäten'));
+  acts.forEach(a => box.append(el('div', { class: 'food' },
+    el('div', { class: 'info' }, el('div', {}, a.title || a.type || 'Aktivität'),
+      el('div', { class: 'muted' }, [a.type, a.min ? a.min + ' min' : '', a.kcal ? a.kcal + ' kcal' : ''].filter(Boolean).join(' · '))))));
+}
+
+/* ---------- Navigation ---------- */
+let view = 'today';
+function show(v) {
+  view = v;
+  ['today', 'stats', 'settings'].forEach(x => $('view-' + x).classList.toggle('hidden', x !== v));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('title').textContent = { today: 'Heute', stats: 'Auswertung', settings: 'Einstellungen' }[v];
+  $('datenav').classList.toggle('hidden', v === 'settings' || (v === 'stats' && range !== 1));
+  render();
+  window.scrollTo(0, 0);
+}
+function render() {
+  $('dateLabel').textContent = dayLabel(curDay);
+  $('nextDay').disabled = curDay >= todayIso();
+  $('nextDay').style.opacity = curDay >= todayIso() ? .3 : 1;
+  if (view === 'today') { renderHabits(); renderActivities(); renderFoods(); renderRecent(); }
+  if (view === 'stats') renderStats();
+  if (view === 'settings') renderSettings();
+}
+
+/* ---------- Events ---------- */
+document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => show(b.dataset.v)));
+$('prevDay').onclick = () => { curDay = addDays(curDay, -1); render(); };
+$('nextDay').onclick = () => { if (curDay < todayIso()) { curDay = addDays(curDay, 1); render(); } };
+$('dateLabel').onclick = () => { curDay = todayIso(); render(); };
+$('foodName').addEventListener('input', () => { form.manualCat = false; form.manualR = false; updateSuggestion(); });
+$('foodName').addEventListener('keydown', e => { if (e.key === 'Enter') addFood(); });
+$('foodCat').addEventListener('change', e => {
+  form.cat = e.target.value; form.manualCat = !!form.cat;
+  if (!form.manualR) setRating(form.cat ? CAT[form.cat].r : '');
+  $('suggest').textContent = '';
+});
+document.querySelectorAll('#rateBox .chip').forEach(b => b.addEventListener('click', () => { form.manualR = true; setRating(b.dataset.r); }));
+$('pMinus').onclick = () => { form.portions = Math.max(0.5, form.portions - 0.5); $('pVal').textContent = fmt(form.portions); };
+$('pPlus').onclick = () => { form.portions = Math.min(10, form.portions + 0.5); $('pVal').textContent = fmt(form.portions); };
+$('addFood').onclick = addFood;
+$('rangeSeg').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  range = +b.dataset.d;
+  $('rangeSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  $('datenav').classList.toggle('hidden', range !== 1);
+  render();
+}));
+$('addHabit').onclick = () => {
+  const v = $('newHabit').value.trim();
+  if (!v) return;
+  const type = $('newHabitType').value;
+  state.habits.push(type === 'time' ? { id: 'h' + uid(), name: v, type: 'time', goal: 20 } : { id: 'h' + uid(), name: v }); $('newHabit').value = ''; save(); renderSettings(); toast('Habit hinzugefügt');
+};
+$('newHabit').addEventListener('keydown', e => { if (e.key === 'Enter') $('addHabit').click(); });
+$('gMinus').onclick = () => { state.goalFV = Math.max(1, state.goalFV - 1); save(); renderSettings(); };
+$('gPlus').onclick = () => { state.goalFV = Math.min(12, state.goalFV + 1); save(); renderSettings(); };
+$('exportBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = el('a', { href: URL.createObjectURL(blob), download: `habits-essen-backup-${todayIso()}.json` });
+  document.body.append(a); a.click(); a.remove();
+  toast('Backup gespeichert (Downloads)');
+};
+$('importBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!data || !Array.isArray(data.habits) || typeof data.foods !== 'object') throw new Error('Format');
+    state = Object.assign(freshState(), data); save(); render(); toast('Backup importiert');
+  } catch (err) { toast('Datei ist kein gültiges Backup'); }
+  e.target.value = '';
+};
+$('resetBtn').onclick = () => {
+  if (confirmTwice('reset', 'Wirklich ALLES löschen? Nochmal tippen zum Bestätigen.')) { state = freshState(); save(); render(); toast('Alle Daten gelöscht'); }
+};
+$('limitReset').onclick = () => { state.limits = {}; save(); renderSettings(); toast('Limits zurückgesetzt'); };
+$('autoMove').onchange = e => { state.auto.move = e.target.value; save(); };
+$('autoStrength').onchange = e => { state.auto.strength = e.target.value; save(); };
+$('mMinus').onclick = () => { state.auto.moveMin = Math.max(5, state.auto.moveMin - 5); save(); renderSettings(); };
+$('mPlus').onclick = () => { state.auto.moveMin = Math.min(180, state.auto.moveMin + 5); save(); renderSettings(); };
+$('garminBtn').onclick = () => $('garminFile').click();
+$('garminFile').onchange = async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    const r = importGarmin(await file.text());
+    save(); render();
+    toast(`${r.added} Aktivitäten importiert` + (r.dupes ? `, ${r.dupes} schon vorhanden` : '') + (r.checked ? `, ${r.checked} Habits abgehakt` : ''));
+  } catch (err) { toast('Import fehlgeschlagen: ' + err.message); }
+  e.target.value = '';
+};
+// Tageswechsel, wenn die App über Mitternacht offen bleibt
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+
+/* ---------- Start ---------- */
+fillCatSelect();
+$('foodMeal').value = defaultMeal();
+try { localStorage.setItem(KEY + '.test', '1'); localStorage.removeItem(KEY + '.test'); } catch (e) { storageOk = false; }
+showWarn();
+show('today');
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
